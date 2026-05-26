@@ -11,7 +11,7 @@
   <img src="https://img.shields.io/badge/Go-1.22-00ADD8?style=for-the-badge&logo=go" alt="Go" />
   <img src="https://img.shields.io/badge/Redis-7-DC382D?style=for-the-badge&logo=redis" alt="Redis" />
   <img src="https://img.shields.io/badge/Docker-Engine-2496ED?style=for-the-badge&logo=docker" alt="Docker" />
-  <img src="https://img.shields.io/badge/PostgreSQL-3ECF8E?style=for-the-badge&logo=postgresql" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb" alt="MongoDB" />
 </div>
 
 <br />
@@ -33,7 +33,7 @@
 ```mermaid
 graph TD;
     Browser["🌐 Browser (Next.js 14)"] -->|REST + WebSocket| API["⚙️ API Server (Go + Gin)"];
-    API --> DB[("🗄️ NeonDB PostgreSQL")];
+    API --> DB[("🗄️ MongoDB")];
     API --> Redis["⚡ Redis Queue (asynq)"];
     API --> WSHub["📡 WebSocket Hub"];
     Redis --> Worker["👷 Worker Service (Go)"];
@@ -64,17 +64,16 @@ Open **[http://localhost:3000](http://localhost:3000)** in your browser.
 
 ## 🛠 Full Stack Setup
 
-To run the complete platform, you need Node.js, Go 1.22+, Docker, and a NeonDB account.
+To run the complete platform, you need Node.js, Go 1.22+, Docker, and a MongoDB instance (like MongoDB Atlas).
 
 ### 1️⃣ Database Setup
-1. Create a project on [NeonDB](https://neon.tech).
-2. Copy the Connection String.
-3. Run the migrations located in `backend/db/migrations/`.
+1. Create a cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) or run MongoDB locally.
+2. Get your connection string (MongoDB URI).
 
 ### 2️⃣ Backend Initialization
 ```bash
 cd kenyx/backend
-cp .env.example .env  # Update with your NeonDB URI
+cp .env.example .env  # Update with your MONGODB_URI
 docker compose up redis -d
 go mod download
 go run cmd/api/main.go
@@ -97,7 +96,6 @@ npm run dev
 - `/frontend` - **Next.js 14** application with App Router, Tailwind CSS, Zustand, and Monaco Editor.
 - `/backend` - **Go** microservices including the API server, Redis queue worker, and WebSocket Hub.
 - `/backend/scratch` - Maintenance and utility scripts.
-- `/backend/db/migrations` - PostgreSQL schema definitions.
 
 ---
 
