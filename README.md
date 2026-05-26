@@ -108,7 +108,6 @@ npm run dev
 | **Go** | `kenyx-runner-go` | `solution.go` |
 | **C++** | `kenyx-runner-cpp` | `solution.cpp` |
 | **Java** | `kenyx-runner-java` | `Solution.java` |
-| **Rust** | `kenyx-runner-rust` | `solution.rs` |
 
 ---
 
