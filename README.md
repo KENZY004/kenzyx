@@ -117,5 +117,5 @@ For production, we recommend deploying the **Frontend** on Vercel, the **Backend
 ---
 
 <div align="center">
-  <i>Built with ❤️ by the open-source community to redefine competitive programming.</i>
+  <i>Built with ❤️ by Kenzy to redefine competitive programming.</i>
 </div>
