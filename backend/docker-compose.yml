@@ -1,0 +1,99 @@
+
+
+services:
+  # ─── Redis (Queue + Leaderboard cache) ───────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: kenyx_redis
+    ports:
+      - "6379:6379"
+    command: redis-server --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Kenyx API Server ─────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: kenyx_api
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - MONGODB_URI=${MONGODB_URI}
+      - REDIS_ADDR=redis:6379
+      - JWT_SECRET=${JWT_SECRET:-kenyx-super-secret-change-this}
+      - GIN_MODE=${GIN_MODE:-release}
+      - PORT=8080
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      redis:
+        condition: service_healthy
+      python-runner:
+        condition: service_started
+    restart: unless-stopped
+
+  # ─── Kenyx Worker ─────────────────────────────────────────────────────────────
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: kenyx_worker
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - MONGODB_URI=${MONGODB_URI}
+      - REDIS_ADDR=redis:6379
+      - WS_HUB_URL=http://api:8080
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Docker-in-Docker for execution
+    depends_on:
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_started
+      python-runner:
+        condition: service_started
+    restart: unless-stopped
+
+  # ─── Runners (Built automatically) ──────────────────────────────────────────
+  python-runner:
+    build:
+      context: ./docker/runners/python
+    image: kenyx-runner-python:latest
+    command: ["echo", "Python runner image built"]
+    restart: "no"
+
+  node-runner:
+    build:
+      context: ./docker/runners/javascript
+    image: kenyx-runner-node:latest
+    command: ["echo", "Node runner image built"]
+    restart: "no"
+
+  cpp-runner:
+    build:
+      context: ./docker/runners/cpp
+    image: kenyx-runner-cpp:latest
+    command: ["echo", "C++ runner image built"]
+    restart: "no"
+
+  java-runner:
+    build:
+      context: ./docker/runners/java
+    image: kenyx-runner-java:latest
+    command: ["echo", "Java runner image built"]
+    restart: "no"
+
+volumes:
+  redis_data:

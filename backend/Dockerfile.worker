@@ -1,0 +1,25 @@
+# Build stage
+FROM golang:1.26-alpine AS builder
+
+WORKDIR /app
+
+# Copy source code and resolve dependencies
+COPY go.mod go.sum ./
+RUN apk add --no-cache git build-base
+RUN go mod download
+
+COPY . .
+
+# Build the Worker binary
+RUN CGO_ENABLED=0 GOOS=linux go build -o /worker ./cmd/worker
+
+# Final stage
+FROM alpine:latest
+
+# Install docker CLI so the Go worker can spawn execution containers
+RUN apk add --no-cache docker-cli
+
+WORKDIR /app
+COPY --from=builder /worker /app/worker
+
+CMD ["/app/worker"]

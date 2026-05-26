@@ -1,0 +1,24 @@
+# Build stage
+FROM golang:1.26-alpine AS builder
+
+WORKDIR /app
+
+# Copy source code and resolve dependencies
+COPY go.mod go.sum ./
+RUN apk add --no-cache git build-base
+RUN go mod download
+
+COPY . .
+
+# Build the API binary
+RUN CGO_ENABLED=0 GOOS=linux go build -o /api ./cmd/api
+
+# Final stage
+FROM alpine:latest
+
+WORKDIR /app
+COPY --from=builder /api /app/api
+
+EXPOSE 8080
+
+CMD ["/app/api"]
