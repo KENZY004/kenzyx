@@ -105,7 +105,6 @@ npm run dev
 | :--- | :--- | :--- |
 | **Python 3** | `kenyx-runner-python` | `solution.py` |
 | **JavaScript** | `kenyx-runner-node` | `solution.js` |
-| **Go** | `kenyx-runner-go` | `solution.go` |
 | **C++** | `kenyx-runner-cpp` | `solution.cpp` |
 | **Java** | `kenyx-runner-java` | `Solution.java` |
 
